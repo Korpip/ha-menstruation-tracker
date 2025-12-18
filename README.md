@@ -62,6 +62,7 @@ Restart Home Assistant
 
 Configuration
 Step 1: Add to configuration.yaml
+```
 yaml# Menstruation Tracker Integration
 menstruation_tracker:
   users:
@@ -80,31 +81,37 @@ input_text:
   daughter_notification_settings:
     name: "Daughter Notification Settings"
     max: 1000
-
 # Lovelace resources
 lovelace:
   mode: yaml
   resources:
     - url: /local/menstruation-tracker-card.js
       type: module
+```
+
 Step 2: Add Automations
 Copy the contents of examples/automations.yaml to your automations.yaml file, or create a separate package file:
+```
 yaml# In configuration.yaml
 homeassistant:
   packages:
     menstruation_tracker: !include packages/menstruation_tracker.yaml
+```
 Then create packages/menstruation_tracker.yaml with the automation content.
 Step 3: Add Lovelace Card
 Add the card to your dashboard:
 Single User Card:
+```
 yamltype: custom:menstruation-tracker-card
 entity: sensor.menstruation_tracker_user1
+```
 Parent Mode Card:
 yamltype: custom:menstruation-tracker-card
 parent_mode: true
 child_entities:
   - sensor.menstruation_tracker_daughter1
   - sensor.menstruation_tracker_daughter2
+```
 Full Dashboard Example:
 See examples/dashboard.yaml for a complete dashboard layout.
 Step 4: Restart Home Assistant
@@ -118,6 +125,7 @@ Click "End Period" button when period ends
 Click "Log Symptom" to add symptoms or notes
 
 Via Services:
+```
 yaml# Start period
 service: menstruation_tracker.log_period_start
 data:
@@ -137,6 +145,7 @@ data:
   symptom: "Cramps"
   notes: "Mild discomfort"
   date: "2025-01-15"  # Optional
+```
 Setting Up Notifications
 
 Click the "🔔 Notifications" button in the card
@@ -147,13 +156,17 @@ Click "Save Settings"
 
 Backup & Restore
 Backup:
+```
 yamlservice: menstruation_tracker.backup_data
 data:
   backup_path: "/config/backups/menstruation_backup.json"
+```
 Restore:
+```
 yamlservice: menstruation_tracker.restore_data
 data:
   backup_path: "/config/backups/menstruation_backup.json"
+```
 Parent Mode
 Parents can:
 
