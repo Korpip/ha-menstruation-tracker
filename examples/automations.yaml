@@ -1,0 +1,335 @@
+# Menstruation Tracker Notification Automations
+# Add these to your automations.yaml or create a separate file
+
+# First, add these input_text helpers to configuration.yaml:
+# input_text:
+#   user1_notification_settings:
+#     name: "User1 Notification Settings"
+#     max: 1000
+#   user2_notification_settings:
+#     name: "User2 Notification Settings"
+#     max: 1000
+
+# ===================================================
+# AUTOMATION 1: Period Expected Soon (2 days before)
+# ===================================================
+- id: menstruation_period_upcoming
+  alias: "Menstruation - Period Expected Soon"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-period-upcoming'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {% set days_until = state_attr(sensor, 'days_until_next_period') | int(99) %}
+            {% set days_before = config.daysBefore | int(2) %}
+            {{ days_until == days_before }}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "🩸 Period Expected Soon"
+              message: "Your period is expected in {{ state_attr('sensor.menstruation_tracker_user1', 'days_until_next_period') }} days ({{ state_attr('sensor.menstruation_tracker_user1', 'next_period') }})"
+
+# ===================================================
+# AUTOMATION 2: Period Due Today
+# ===================================================
+- id: menstruation_period_due
+  alias: "Menstruation - Period Due Today"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-period-due'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {% set days_until = state_attr(sensor, 'days_until_next_period') | int(99) %}
+            {{ days_until == 0 }}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "🩸 Period Expected Today"
+              message: "Your period is expected today. Don't forget to log it when it starts!"
+
+# ===================================================
+# AUTOMATION 3: Period Late
+# ===================================================
+- id: menstruation_period_late
+  alias: "Menstruation - Period Late"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-period-late'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {% set days_until = state_attr(sensor, 'days_until_next_period') | int(99) %}
+            {% set days_late_threshold = config.daysLate | int(3) %}
+            {{ days_until <= (0 - days_late_threshold) and states(sensor) != 'In Period' }}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "⚠️ Period Late"
+              message: "Your period is {{ (0 - state_attr('sensor.menstruation_tracker_user1', 'days_until_next_period')) | int }} days late. Consider taking a test or consulting a doctor if this is unusual."
+
+# ===================================================
+# AUTOMATION 4: Fertile Window Starts
+# ===================================================
+- id: menstruation_fertile_window_start
+  alias: "Menstruation - Fertile Window Start"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-fertile-start'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {% set fertility = state_attr(sensor, 'fertility_window') %}
+            {% if fertility %}
+              {% set fertile_start = fertility.fertile_window_start %}
+              {{ now().strftime('%Y-%m-%d') == fertile_start }}
+            {% else %}
+              false
+            {% endif %}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "🌸 Fertile Window Begins"
+              message: "Your fertile window starts today and ends {{ state_attr('sensor.menstruation_tracker_user1', 'fertility_window').fertile_window_end }}"
+
+# ===================================================
+# AUTOMATION 5: Ovulation Day
+# ===================================================
+- id: menstruation_ovulation_day
+  alias: "Menstruation - Ovulation Day"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-ovulation'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {% set fertility = state_attr(sensor, 'fertility_window') %}
+            {% if fertility %}
+              {% set ovulation_date = fertility.ovulation_date %}
+              {{ now().strftime('%Y-%m-%d') == ovulation_date }}
+            {% else %}
+              false
+            {% endif %}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "🌸 Ovulation Day"
+              message: "Today is your expected ovulation day based on NFP tracking."
+
+# ===================================================
+# AUTOMATION 6: Daily Log Reminder (During Period)
+# ===================================================
+- id: menstruation_daily_log_reminder
+  alias: "Menstruation - Daily Log Reminder"
+  trigger:
+    - platform: time
+      at: "20:00:00"  # Evening reminder
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-log-reminder'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {{ states(sensor) == 'In Period' }}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "📝 Log Your Data"
+              message: "Remember to log any symptoms or notes for today. You're on day {{ state_attr('sensor.menstruation_tracker_user1', 'days_in_current_period') }} of your period."
+
+# ===================================================
+# AUTOMATION 7: Reminder to End Period
+# ===================================================
+- id: menstruation_end_period_reminder
+  alias: "Menstruation - End Period Reminder"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+        {% if settings != 'unknown' and settings != '' %}
+          {% set config = settings | from_json %}
+          {% if config.enabled and config.notifications['notify-end-reminder'] %}
+            {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+            {% set days_in_period = state_attr(sensor, 'days_in_current_period') | int(0) %}
+            {% set remind_after = config.daysRemindEnd | int(7) %}
+            {{ states(sensor) == 'In Period' and days_in_period >= remind_after }}
+          {% else %}
+            false
+          {% endif %}
+        {% else %}
+          false
+        {% endif %}
+  action:
+    - repeat:
+        for_each: >
+          {% set user = 'user1' %}
+          {% set settings = states('input_text.' ~ user ~ '_notification_settings') %}
+          {% set config = settings | from_json %}
+          {{ config.devices }}
+        sequence:
+          - service: "{{ repeat.item }}"
+            data:
+              title: "📝 Long Period Notice"
+              message: "You've been in your period for {{ state_attr('sensor.menstruation_tracker_user1', 'days_in_current_period') }} days. Don't forget to log the end date when it finishes!"
+
+# ===================================================
+# TEMPLATE: Multi-User Automation (Copy and modify for each user)
+# ===================================================
+# Replace 'user1' with actual username throughout
+# Update sensor names: sensor.menstruation_tracker_USERNAME
+# Update input_text: input_text.USERNAME_notification_settings
+
+# ===================================================
+# ACTIONABLE NOTIFICATIONS (iOS/Android)
+# ===================================================
+- id: menstruation_period_start_actionable
+  alias: "Menstruation - Period Start Actionable Notification"
+  trigger:
+    - platform: time
+      at: "09:00:00"
+  condition:
+    - condition: template
+      value_template: >
+        {% set user = 'user1' %}
+        {% set sensor = 'sensor.menstruation_tracker_' ~ user %}
+        {% set days_until = state_attr(sensor, 'days_until_next_period') | int(99) %}
+        {{ days_until == 0 and states(sensor) != 'In Period' }}
+  action:
+    - service: notify.mobile_app_your_phone
+      data:
+        title: "🩸 Period Expected Today"
+        message: "Has your period started?"
+        data:
+          actions:
+            - action: "PERIOD_STARTED"
+              title: "Yes, Log It"
+            - action: "PERIOD_NOT_YET"
+              title: "Not Yet"
+
+- id: menstruation_handle_period_start
+  alias: "Menstruation - Handle Period Start Action"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "PERIOD_STARTED"
+  action:
+    - service: menstruation_tracker.log_period_start
+      data:
+        user: "user1"
