@@ -47,7 +47,7 @@ Open HACS in your Home Assistant instance
 Click on "Integrations"
 Click the three dots in the top right corner
 Select "Custom repositories"
-Add this repository URL: https://github.com/yourusername/ha-menstruation-tracker
+Add this repository URL: https://github.com/Korpip/ha-menstruation-tracker
 Select category "Integration"
 Click "Add"
 Find "Menstruation Tracker" in the integration list and click "Download"
@@ -210,8 +210,7 @@ MIT License - See LICENSE file for details
 Support
 For issues, questions, or suggestions:
 
-GitHub Issues: yourusername/ha-menstruation-tracker/issues
-Home Assistant Community: [Link to forum thread]
+GitHub Issues: Korpip/ha-menstruation-tracker/issues
 
 Screenshots
 [Add screenshots here]
