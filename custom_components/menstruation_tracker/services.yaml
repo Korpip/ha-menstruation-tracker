@@ -1,0 +1,130 @@
+log_period_start:
+  name: Log Period Start
+  description: Log the start of a menstrual period
+  fields:
+    user:
+      name: User
+      description: Username for the tracker
+      required: true
+      example: "user1"
+      selector:
+        text:
+    date:
+      name: Date
+      description: Date of period start (YYYY-MM-DD format). Defaults to today if not provided.
+      required: false
+      example: "2025-01-15"
+      selector:
+        date:
+
+log_period_end:
+  name: Log Period End
+  description: Log the end of a menstrual period
+  fields:
+    user:
+      name: User
+      description: Username for the tracker
+      required: true
+      example: "user1"
+      selector:
+        text:
+    date:
+      name: Date
+      description: Date of period end (YYYY-MM-DD format). Defaults to today if not provided.
+      required: false
+      example: "2025-01-20"
+      selector:
+        date:
+
+log_symptom:
+  name: Log Symptom
+  description: Log a symptom or note
+  fields:
+    user:
+      name: User
+      description: Username for the tracker
+      required: true
+      example: "user1"
+      selector:
+        text:
+    symptom:
+      name: Symptom
+      description: Symptom or observation to log
+      required: true
+      example: "Cramps"
+      selector:
+        text:
+    notes:
+      name: Notes
+      description: Additional notes (optional)
+      required: false
+      example: "Mild discomfort in the morning"
+      selector:
+        text:
+    date:
+      name: Date
+      description: Date of symptom (YYYY-MM-DD format). Defaults to today if not provided.
+      required: false
+      example: "2025-01-15"
+      selector:
+        date:
+
+backup_data:
+  name: Backup Data
+  description: Backup all menstruation tracking data to a JSON file
+  fields:
+    backup_path:
+      name: Backup Path
+      description: Full path where backup file should be saved
+      required: false
+      example: "/config/backups/menstruation_backup.json"
+      selector:
+        text:
+
+restore_data:
+  name: Restore Data
+  description: Restore menstruation tracking data from a backup JSON file
+  fields:
+    backup_path:
+      name: Backup Path
+      description: Full path to the backup file to restore from
+      required: false
+      example: "/config/backups/menstruation_backup.json"
+      selector:
+        text:
+
+modify_user_data:
+  name: Modify User Data (Parent Access)
+  description: Allow a parent to modify data for a child user
+  fields:
+    user:
+      name: Parent User
+      description: Username of the parent making changes
+      required: true
+      example: "parent"
+      selector:
+        text:
+    target_user:
+      name: Target User
+      description: Username of the child whose data is being modified
+      required: true
+      example: "daughter"
+      selector:
+        text:
+
+update_notifications:
+  name: Update Notifications
+  description: Update notification settings for a user (called automatically by card)
+  fields:
+    user:
+      name: User
+      description: Username for the tracker
+      required: true
+      example: "user1"
+      selector:
+        text:
+    settings:
+      name: Settings
+      description: JSON object containing notification settings
+      required: true
+      example: '{"enabled": true, "devices": ["notify.mobile_app"]}'
