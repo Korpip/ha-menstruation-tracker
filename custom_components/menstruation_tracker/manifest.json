@@ -1,0 +1,8 @@
+{
+  "domain": "menstruation_tracker",
+  "name": "Menstruation Tracker",
+  "documentation": "https://github.com/Korpip/menstruation_tracker",
+  "requirements": [],
+  "codeowners": [],
+  "version": "1.0.0"
+}
