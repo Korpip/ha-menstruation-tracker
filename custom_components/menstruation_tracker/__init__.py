@@ -15,6 +15,7 @@ from homeassistant.const import CONF_NAME
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.storage import Store
+from homeassistant.helpers.discovery import async_load_platform
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -244,10 +245,18 @@ async def async_setup(hass: HomeAssistant, config: dict):
         })
     )
     
-    # Load platforms
-    hass.async_create_task(
-        hass.helpers.discovery.async_load_platform('sensor', DOMAIN, {}, config)
-    )
+# Create sensors directly
+    from homeassistant.helpers.entity_component import EntityComponent
+    
+    component = EntityComponent(_LOGGER, DOMAIN, hass)
+    
+    sensors = []
+    for user in conf.get(CONF_USERS, []):
+        sensor = MenstruationTrackerSensor(hass, user)
+        hass.data[DOMAIN]["trackers"][user] = sensor
+        sensors.append(sensor)
+    
+    await component.async_add_entities(sensors)
     
     return True
 
