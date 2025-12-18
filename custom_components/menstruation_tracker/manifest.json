@@ -1,8 +1,12 @@
 {
   "domain": "menstruation_tracker",
   "name": "Menstruation Tracker",
-  "documentation": "https://github.com/Korpip/menstruation_tracker",
+  "documentation": "https://github.com/Korpip/ha-menstruation-tracker",
+  "issue_tracker": "https://github.com/Korpip/ha-menstruation-tracker/issues",
+  "codeowners": ["@Korpip"],
   "requirements": [],
-  "codeowners": [],
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "iot_class": "calculated",
+  "config_flow": false,
+  "dependencies": []
 }
