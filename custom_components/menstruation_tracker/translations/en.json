@@ -1,0 +1,25 @@
+{
+  "config": {
+    "title": "Menstruation Tracker",
+    "step": {
+      "user": {
+        "title": "Set up Menstruation Tracker",
+        "description": "Configure menstruation tracking users"
+      }
+    }
+  },
+  "services": {
+    "log_period_start": {
+      "name": "Log Period Start",
+      "description": "Log the start of a menstrual period"
+    },
+    "log_period_end": {
+      "name": "Log Period End",
+      "description": "Log the end of a menstrual period"
+    },
+    "log_symptom": {
+      "name": "Log Symptom",
+      "description": "Log a symptom or note"
+    }
+  }
+}
