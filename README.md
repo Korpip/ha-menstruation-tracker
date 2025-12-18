@@ -89,7 +89,7 @@ lovelace:
       type: module
 ```
 
-Step 2: Add Automations
+SKIP!!! Step 2: Add Automations
 Copy the contents of examples/automations.yaml to your automations.yaml file, or create a separate package file:
 ```
 # In configuration.yaml
