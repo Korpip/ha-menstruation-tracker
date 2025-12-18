@@ -63,7 +63,7 @@ Restart Home Assistant
 Configuration
 Step 1: Add to configuration.yaml
 ```
-yaml# Menstruation Tracker Integration
+# Menstruation Tracker Integration
 menstruation_tracker:
   users:
     - "user1"
@@ -92,7 +92,7 @@ lovelace:
 Step 2: Add Automations
 Copy the contents of examples/automations.yaml to your automations.yaml file, or create a separate package file:
 ```
-yaml# In configuration.yaml
+# In configuration.yaml
 homeassistant:
   packages:
     menstruation_tracker: !include packages/menstruation_tracker.yaml
@@ -102,11 +102,12 @@ Step 3: Add Lovelace Card
 Add the card to your dashboard:
 Single User Card:
 ```
-yamltype: custom:menstruation-tracker-card
+type: custom:menstruation-tracker-card
 entity: sensor.menstruation_tracker_user1
 ```
 Parent Mode Card:
-yamltype: custom:menstruation-tracker-card
+```
+type: custom:menstruation-tracker-card
 parent_mode: true
 child_entities:
   - sensor.menstruation_tracker_daughter1
@@ -126,7 +127,7 @@ Click "Log Symptom" to add symptoms or notes
 
 Via Services:
 ```
-yaml# Start period
+# Start period
 service: menstruation_tracker.log_period_start
 data:
   user: "user1"
@@ -157,13 +158,13 @@ Click "Save Settings"
 Backup & Restore
 Backup:
 ```
-yamlservice: menstruation_tracker.backup_data
+service: menstruation_tracker.backup_data
 data:
   backup_path: "/config/backups/menstruation_backup.json"
 ```
 Restore:
 ```
-yamlservice: menstruation_tracker.restore_data
+service: menstruation_tracker.restore_data
 data:
   backup_path: "/config/backups/menstruation_backup.json"
 ```
